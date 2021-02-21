@@ -15,7 +15,9 @@
 // limitations under the License.
 
 using System;
+using System.Buffers.Binary;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -132,6 +134,25 @@ namespace Emzi0767.CompanionCube.Modules
 
             var resstr = string.Join(" ", results);
             await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":game_die:")} Results: {resstr}");
+        }
+
+        [Command("pp"), Description("Are you ready to learn the truth?")]
+        public async Task PPAsync(CommandContext ctx)
+        {
+            await ctx.RespondAsync($"Your PP size (inches): {Derive(ctx.User.Id)}");
+
+            static int Derive(ulong id)
+            {
+                Span<byte> src = stackalloc byte[sizeof(ulong) * 2];
+                BinaryPrimitives.WriteUInt64LittleEndian(src, id);
+                BinaryPrimitives.WriteUInt64BigEndian(src.Slice(sizeof(ulong)), id);
+
+                using var hash = SHA384.Create();
+                Span<byte> dst = stackalloc byte[hash.HashSize / 8];
+                hash.TryComputeHash(src, dst, out _);
+
+                return (int)(BinaryPrimitives.ReadUInt64BigEndian(dst[^(sizeof(ulong))..]) % 13);
+            }
         }
     }
 }
