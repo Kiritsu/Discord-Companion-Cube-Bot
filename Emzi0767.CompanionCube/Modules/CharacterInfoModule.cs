@@ -65,7 +65,7 @@ namespace Emzi0767.CompanionCube.Modules
                     sb = new StringBuilder();
                 }
 
-                sb.Append(xcp).Append("\n");
+                sb.Append(xcp).Append('\n');
             }
 
             if (pn != 1)
@@ -145,13 +145,13 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     var sb = new StringBuilder();
                     if (xcp.NumericValue?.Decimal != null)
-                        sb.Append("Decimal: ").Append(xcp.NumericValue?.Decimal?.ToString("#,##0")).Append("\n");
+                        sb.Append("Decimal: ").Append(xcp.NumericValue?.Decimal?.ToString("#,##0")).Append('\n');
 
                     if (xcp.NumericValue?.Digit != null)
-                        sb.Append("Digit: ").Append(xcp.NumericValue?.Digit?.ToString("#,##0")).Append("\n");
+                        sb.Append("Digit: ").Append(xcp.NumericValue?.Digit?.ToString("#,##0")).Append('\n');
 
                     if (xcp.NumericValue?.Numeric != null)
-                        sb.Append("Numeric: ").Append(xcp.NumericValue?.Numeric).Append("\n");
+                        sb.Append("Numeric: ").Append(xcp.NumericValue?.Numeric).Append('\n');
 
                     if (sb.Length > 0)
                         embed.AddField("Numerical Values", sb.ToString());

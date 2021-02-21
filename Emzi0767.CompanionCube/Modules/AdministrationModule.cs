@@ -71,15 +71,13 @@ namespace Emzi0767.CompanionCube.Modules
                 await this.Database.Database.OpenConnectionAsync();
 
                 cmd.CommandText = query;
-                using (var rdr = await cmd.ExecuteReaderAsync())
+                using var rdr = await cmd.ExecuteReaderAsync();
+                while (await rdr.ReadAsync())
                 {
-                    while (await rdr.ReadAsync())
-                    {
-                        var dict = new Dictionary<string, string>();
-                        for (i = 0; i < rdr.FieldCount; i++)
-                            dict[rdr.GetName(i)] = rdr[i] is DBNull ? "<null>" : rdr[i].ToString();
-                        dat.Add(dict);
-                    }
+                    var dict = new Dictionary<string, string>();
+                    for (i = 0; i < rdr.FieldCount; i++)
+                        dict[rdr.GetName(i)] = rdr[i] is DBNull ? "<null>" : rdr[i].ToString();
+                    dat.Add(dict);
                 }
             }
             
@@ -133,7 +131,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (cs1 == -1 || cs2 == -1)
                 throw new ArgumentException("You need to wrap the code into a code block.", nameof(code));
 
-            code = code.Substring(cs1, cs2 - cs1);
+            code = code[cs1..cs2];
 
             var embed = new DiscordEmbedBuilder
             {
@@ -394,7 +392,7 @@ namespace Emzi0767.CompanionCube.Modules
                         sb.Append(string.Join(" ", dcfg.DefaultPrefixes.Select(Formatter.InlineCode)));
 
                     if (dcfg.DefaultPrefixes.Any() && dcfg.EnableMentionPrefix)
-                        sb.Append(" ");
+                        sb.Append(' ');
 
                     if (dcfg.EnableMentionPrefix)
                         sb.Append(ctx.Client.CurrentUser.Mention);
@@ -405,7 +403,7 @@ namespace Emzi0767.CompanionCube.Modules
                         sb.Append(ctx.Client.CurrentUser.Mention);
 
                     if (dcfg.EnableMentionPrefix && gpfx.EnableDefault == true && dcfg.DefaultPrefixes.Any())
-                        sb.Append(" ");
+                        sb.Append(' ');
 
                     if (gpfx.EnableDefault == true && dcfg.DefaultPrefixes.Any())
                     {
@@ -413,7 +411,7 @@ namespace Emzi0767.CompanionCube.Modules
                     }
 
                     if (gpfx.EnableDefault == true && dcfg.DefaultPrefixes.Any() && gpfx.Prefixes?.Any() == true)
-                        sb.Append(" ");
+                        sb.Append(' ');
 
                     if (gpfx.Prefixes?.Any() == true)
                     {
@@ -489,7 +487,7 @@ namespace Emzi0767.CompanionCube.Modules
                     gpfx = new DatabasePrefix
                     {
                         GuildId = gid,
-                        Prefixes = new string[] { },
+                        Prefixes = Array.Empty<string>(),
                         EnableDefault = enable
                     };
                     this.Database.Prefixes.Add(gpfx);

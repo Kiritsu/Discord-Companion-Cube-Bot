@@ -116,7 +116,9 @@ namespace Emzi0767.CompanionCube.Modules
             }
 
             var msg = string.Join("\n", feeds.Select(x => x.FormatFeed()));
-            await ctx.Message.RespondAsync(msg, mentions: Array.Empty<IMention>());
+            await ctx.RespondAsync(new DiscordMessageBuilder()
+                .WithContent(msg)
+                .WithAllowedMentions(Mentions.None));
         }
     }
 }

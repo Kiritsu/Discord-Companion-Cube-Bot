@@ -84,7 +84,7 @@ namespace Emzi0767.CompanionCube.Modules
             for (var i = 0; i < count; i++)
             {
                 choice[i] = choices[this.RNG.Next(choices.Length)].Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
-                sb.Append("Choice ").Append(i + 1).Append(": ").Append(choice[i]).Append("\n");
+                sb.Append("Choice ").Append(i + 1).Append(": ").Append(choice[i]).Append('\n');
             }
 
             var top = choice.GroupBy(x => x)
@@ -99,7 +99,7 @@ namespace Emzi0767.CompanionCube.Modules
                 // tie-breaker
                 var tie = top.Select(xg => xg.Key);
                 topc = tie.ElementAt(this.RNG.Next(0, tie.Count()));
-                sb.Append("Tie-breaker: ").Append(topc).Append("\n");
+                sb.Append("Tie-breaker: ").Append(topc).Append('\n');
             }
 
             sb.Append("\nResult:\n").Append(topc);
@@ -110,13 +110,13 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task DiceAsync(CommandContext ctx, [Description("Dies to roll, in xdy format (e.g. 2d20 or d6).")] string dice = "1d6")
         {
             if (string.IsNullOrWhiteSpace(dice))
-                throw new ArgumentNullException("You need to specify what dice to roll.");
+                throw new ArgumentNullException(nameof(dice), "You need to specify what dice to roll.");
 
             await ctx.TriggerTypingAsync();
 
             var m = this.DiceRegex.Match(dice);
             if (!m.Success)
-                throw new ArgumentNullException("You need to specify valid dice format.");
+                throw new ArgumentNullException(nameof(dice), "You need to specify valid dice format.");
 
             var count = 1;
             if (m.Groups["count"].Success && !int.TryParse(m.Groups["count"].Value, out count))
@@ -145,7 +145,7 @@ namespace Emzi0767.CompanionCube.Modules
             {
                 Span<byte> src = stackalloc byte[sizeof(ulong) * 2];
                 BinaryPrimitives.WriteUInt64LittleEndian(src, id);
-                BinaryPrimitives.WriteUInt64BigEndian(src.Slice(sizeof(ulong)), id);
+                BinaryPrimitives.WriteUInt64BigEndian(src[sizeof(ulong)..], id);
 
                 using var hash = SHA384.Create();
                 Span<byte> dst = stackalloc byte[hash.HashSize / 8];
