@@ -89,14 +89,14 @@ namespace Emzi0767.CompanionCube.Services
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseNpgsql(this.ConnectionStringProvider.GetConnectionString());
+                optionsBuilder.UseNpgsql(this.ConnectionStringProvider.GetConnectionString(), opts => opts.UseTrigrams());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DatabaseEntityKind>()
                 .HasPostgresEnum<DatabaseTagKind>()
-                .HasPostgresExtension("fuzzystrmatch");
+                .HasPostgresExtension("pg_trgm");
 
             modelBuilder.Entity<DatabaseMetadata>(entity =>
             {
@@ -127,6 +127,10 @@ namespace Emzi0767.CompanionCube.Services
             modelBuilder.Entity<DatabaseTag>(entity =>
             {
                 entity.HasKey(e => new { e.Kind, e.ContainerId, e.Name });
+
+                entity.HasIndex(e => e.Name)
+                    .HasMethod("gin")
+                    .HasOperators("gin_trgm_ops");
             });
 
             modelBuilder.Entity<DatabaseTagRevision>(entity =>

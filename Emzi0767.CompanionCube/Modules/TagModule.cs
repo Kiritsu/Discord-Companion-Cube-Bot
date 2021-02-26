@@ -664,11 +664,17 @@ namespace Emzi0767.CompanionCube.Modules
             }
             else
             {
-                var res = this.Database.Tags.FromSqlInterpolated($"select * from tags where ((kind = 'channel' and container_id = {cid}) or (kind = 'guild' and container_id = {gid}) or kind = 'global') and hidden = false and levenshtein_less_equal(name, {name}, 3) < 3");
+                var res = name != null
+                    ? this.Database.Tags.Select(x => new { tag = x, similarity = EF.Functions.TrigramsSimilarity(x.Name, name) })
+                    : this.Database.Tags.Select(x => new { tag = x, similarity = 1.0 });
+
+                res = res.Where(x => (x.tag.Kind == DatabaseTagKind.Global || (x.tag.Kind == DatabaseTagKind.Guild && x.tag.ContainerId == gid) || (x.tag.Kind == DatabaseTagKind.Channel && x.tag.ContainerId == cid)) && !x.tag.IsHidden && x.similarity > 0.1)
+                    .OrderByDescending(x => x.similarity)
+                    .ThenBy(x => x.tag.Name);
 
                 if (res.Any())
                 { 
-                    var sugs = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(xt.Name)).Distinct());
+                    var sugs = string.Join(", ", res.Select(xt => Formatter.InlineCode(xt.tag.Name)).Distinct());
                     await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found. Here are some suggestions:\n\n{sugs}");
                 }
                 else
@@ -979,13 +985,17 @@ namespace Emzi0767.CompanionCube.Modules
                 else
                     like = null;
 
-                var res = like == null ?
-                    this.Database.Tags.Where(x => x.Kind == DatabaseTagKind.Global && !x.IsHidden) :
-                    this.Database.Tags.FromSqlInterpolated($"select * from tags where kind = 'global' and hidden = false and levenshtein_less_equal(name, {like}, 3) < 3");
+                var res = like != null
+                    ? this.Database.Tags.Select(x => new { tag = x, similarity = EF.Functions.TrigramsSimilarity(x.Name, like) })
+                    : this.Database.Tags.Select(x => new { tag = x, similarity = 1.0 });
+
+                res = res.Where(x => x.tag.Kind == DatabaseTagKind.Global && !x.tag.IsHidden && x.similarity > 0.1)
+                    .OrderByDescending(x => x.similarity)
+                    .ThenBy(x => x.tag.Name);
 
                 if (res.Any())
                 {
-                    var tstr = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(xt.Name)).Distinct());
+                    var tstr = string.Join(", ", res.Select(xt => Formatter.InlineCode(xt.tag.Name)).Distinct());
 
                     await ctx.RespondAsync($"Following tags matching your query were found:\n\n{tstr}");
                 }
