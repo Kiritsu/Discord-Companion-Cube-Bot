@@ -1,4 +1,4 @@
-﻿// This file is a part of Companion Cube project.
+// This file is a part of Companion Cube project.
 // 
 // Copyright 2018 Emzi0767
 // 
@@ -99,9 +99,7 @@ namespace Emzi0767.CompanionCube.Services
                 .HasPostgresExtension("pg_trgm");
 
             modelBuilder.Entity<DatabaseMetadata>(entity =>
-            {
-                entity.Property(e => e.MetaKey).ValueGeneratedNever();
-            });
+                entity.Property(e => e.MetaKey).ValueGeneratedNever());
 
             modelBuilder.Entity<DatabasePrefix>(entity =>
             {
@@ -115,14 +113,10 @@ namespace Emzi0767.CompanionCube.Services
             });
 
             modelBuilder.Entity<DatabaseBlacklistedEntity>(entity =>
-            {
-                entity.HasKey(e => new { e.Id, e.Kind });
-            });
+                entity.HasKey(e => new { e.Id, e.Kind }));
 
             modelBuilder.Entity<DatabaseMusicWhitelistedGuild>(entity =>
-            {
-                entity.Property(e => e.GuildId).ValueGeneratedNever();
-            });
+                entity.Property(e => e.GuildId).ValueGeneratedNever());
 
             modelBuilder.Entity<DatabaseTag>(entity =>
             {
@@ -160,11 +154,9 @@ namespace Emzi0767.CompanionCube.Services
                     .HasDatabaseName("ix_rss_name");
             });
 
-            modelBuilder.Entity<DatabasePooperWhitelist>(entity =>
-            {
-                entity.HasIndex(e => e.GuildId)
-                    .HasDatabaseName("ix_pooper_guild_id");
-            });
+            modelBuilder.Entity<DatabasePooperWhitelist>(entity
+                => entity.HasIndex(e => e.GuildId)
+                    .HasDatabaseName("ix_pooper_guild_id"));
         }
     }
 }

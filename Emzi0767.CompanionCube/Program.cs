@@ -1,4 +1,4 @@
-﻿// This file is part of Companion Cube project
+// This file is part of Companion Cube project
 //
 // Copyright 2018 Emzi0767
 // 
@@ -92,7 +92,7 @@ namespace Emzi0767.CompanionCube
             // create shards
             Shards = new Dictionary<int, CompanionCubeBot>();
             var async = new AsyncExecutor();
-            for (int i = 0; i < cfg.Discord.ShardCount; i++)
+            for (var i = 0; i < cfg.Discord.ShardCount; i++)
                 Shards[i] = new CompanionCubeBot(cfg, i, async);
 
             // --- LOADING COMPLETED ---

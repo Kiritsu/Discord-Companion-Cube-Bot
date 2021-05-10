@@ -621,10 +621,9 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
             var cid = (long)ctx.Channel.Id;
 
-            if (!string.IsNullOrWhiteSpace(like))
-                like = Formatter.Strip(like.ToLower()).Trim();
-            else
-                like = null;
+            like = !string.IsNullOrWhiteSpace(like)
+                ? Formatter.Strip(like.ToLower()).Trim()
+                : null;
 
             var res = like == null ?
                 this.Database.Tags.Where(x => ((x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid) || (x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid) || x.Kind == DatabaseTagKind.Global) && !x.IsHidden) :
@@ -980,10 +979,9 @@ namespace Emzi0767.CompanionCube.Modules
                 if (string.IsNullOrWhiteSpace(like) || ForbiddenNames.Contains(like.ToLower()))
                     like = null;
 
-                if (!string.IsNullOrWhiteSpace(like))
-                    like = Formatter.Strip(like.ToLower()).Trim();
-                else
-                    like = null;
+                like = !string.IsNullOrWhiteSpace(like)
+                    ? Formatter.Strip(like.ToLower()).Trim()
+                    : null;
 
                 var res = like != null
                     ? this.Database.Tags.Select(x => new { tag = x, similarity = EF.Functions.TrigramsSimilarity(x.Name, like) })
