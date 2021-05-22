@@ -33,9 +33,6 @@ namespace Emzi0767.CompanionCube.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
-            if (ctx.Guild == null)
-                return Task.FromResult(false);
-
             if (help)
                 return Task.FromResult(true);
 
@@ -44,11 +41,21 @@ namespace Emzi0767.CompanionCube.Attributes
 
             var uid = (long)ctx.User.Id;
             var cid = (long)ctx.Channel.Id;
-            var gid = (long)ctx.Guild.Id;
 
-            var db = ctx.Services.GetService<DatabaseContext>();
-            var blocked = db.EntityBlacklist.Any(x => (x.Id == uid && x.Kind == DatabaseEntityKind.User) || (x.Id == cid && x.Kind == DatabaseEntityKind.Channel) || (x.Id == gid && x.Kind == DatabaseEntityKind.Guild));
-            return Task.FromResult(!blocked);
+            if (ctx.Guild != null)
+            {
+                var gid = (long)ctx.Guild.Id;
+
+                var db = ctx.Services.GetService<DatabaseContext>();
+                var blocked = db.EntityBlacklist.Any(x => (x.Id == uid && x.Kind == DatabaseEntityKind.User) || (x.Id == cid && x.Kind == DatabaseEntityKind.Channel) || (x.Id == gid && x.Kind == DatabaseEntityKind.Guild));
+                return Task.FromResult(!blocked);
+            }
+            else
+            {
+                var db = ctx.Services.GetService<DatabaseContext>();
+                var blocked = db.EntityBlacklist.Any(x => (x.Id == uid && x.Kind == DatabaseEntityKind.User) || (x.Id == cid && x.Kind == DatabaseEntityKind.Channel));
+                return Task.FromResult(!blocked);
+            }
         }
     }
 }

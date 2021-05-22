@@ -34,6 +34,7 @@ namespace Emzi0767.CompanionCube.Modules
 {
     [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlacklisted]
+    [RequireGuild]
     public sealed class MiscCommandsModule : BaseCommandModule
     {
         public MiscCommandsModule()

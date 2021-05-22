@@ -1,4 +1,4 @@
-﻿// This file is part of Companion Cube project
+// This file is part of Companion Cube project
 //
 // Copyright 2018 Emzi0767
 // 
@@ -38,6 +38,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Description("Provides commands for music playback.")]
     [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlacklisted, MusicWhitelisted]
+    [RequireGuild]
     public sealed class MusicModule : BaseCommandModule
     {
         private static ImmutableDictionary<int, DiscordEmoji> NumberMappings { get; }

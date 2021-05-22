@@ -27,7 +27,6 @@ using Emzi0767.CompanionCube.Attributes;
 using Emzi0767.CompanionCube.Data;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace Emzi0767.CompanionCube.Modules
 {
@@ -35,6 +34,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Description("Tag commands. Invoking without a subcommand will display requested tag.")]
     [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlacklisted]
+    [RequireGuild]
     public sealed class TagModule : BaseCommandModule
     {
         private static string[] ForbiddenNames { get; } = new[] { "create", "make", "delete", "remove", "force_delete", "force_remove", "edit", "modify", "force_edit", "force_modify", "history", "view_edit", "alias", "dump", "raw", "info", "unhide", "force_unhide", "hide", "force_hide", "list", "changetype", "force_changetype", "global", "@everyone", "@here" };

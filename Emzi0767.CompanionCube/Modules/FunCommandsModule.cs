@@ -1,4 +1,4 @@
-﻿// This file is part of Companion Cube project
+// This file is part of Companion Cube project
 //
 // Copyright 2018 Emzi0767
 // 
@@ -33,6 +33,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Description("Commands for fun and great justice.")]
     [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlacklisted]
+    [RequireGuild]
     public class FunCommandsModule : BaseCommandModule
     {
         private SecureRandom RNG { get; }

@@ -50,7 +50,7 @@ namespace Emzi0767.CompanionCube.Modules
             this.Database = database;
         }
 
-        [Command("sudo"), Description("Executes a command as another user."), Hidden, RequireOwner]
+        [Command("sudo"), Description("Executes a command as another user."), Hidden, RequireOwner, RequireGuild]
         public async Task SudoAsync(CommandContext ctx, [Description("Member to execute the command as.")] DiscordMember member, [RemainingText, Description("Command text to execute.")] string command)
         {
             var cmd = ctx.CommandsNext.FindCommand(command, out var args);
@@ -216,7 +216,7 @@ namespace Emzi0767.CompanionCube.Modules
             await msg.ModifyAsync(embed: embed.Build());
         }
 
-        [Command("nick"), Aliases("nickname"), Description("Changes the bot's nickname."), OwnerOrPermission(Permissions.ManageNicknames)]
+        [Command("nick"), Aliases("nickname"), Description("Changes the bot's nickname."), OwnerOrPermission(Permissions.ManageNicknames), RequireGuild]
         public async Task NicknameAsync(CommandContext ctx, [Description("New nickname for the bot.")] string new_nickname = "")
         {
             if (!ctx.Guild.Members.TryGetValue(ctx.Client.CurrentUser.Id, out var mbr))
@@ -422,7 +422,7 @@ namespace Emzi0767.CompanionCube.Modules
                 await ctx.RespondAsync(sb.ToString());
             }
 
-            [Command("add"), Description("Adds a prefix to this guild's command prefixes.")]
+            [Command("add"), Description("Adds a prefix to this guild's command prefixes."), RequireGuild]
             public async Task AddPrefixAsync(CommandContext ctx,
                 [Description("Prefix to add to this guild's prefixes.")] string prefix)
             {
@@ -455,7 +455,7 @@ namespace Emzi0767.CompanionCube.Modules
                 await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix added.");
             }
 
-            [Command("remove"), Description("Removes a prefix from this guild's command prefixes."), Aliases("rm", "delete", "del")]
+            [Command("remove"), Description("Removes a prefix from this guild's command prefixes."), Aliases("rm", "delete", "del"), RequireGuild]
             public async Task RemovePrefixAsync(CommandContext ctx,
                 [Description("Prefix to remove from this guild's prefixes.")] string prefix)
             {
@@ -476,7 +476,7 @@ namespace Emzi0767.CompanionCube.Modules
                 await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix removed.");
             }
 
-            [Command("enabledefault"), Description("Configures whether default prefixes are to be enabled in this guild."), Aliases("default", "def")]
+            [Command("enabledefault"), Description("Configures whether default prefixes are to be enabled in this guild."), Aliases("default", "def"), RequireGuild]
             public async Task ConfigureDefaultPrefixesAsync(CommandContext ctx,
                 [RemainingText, Description("Whether default prefixes are to be enabled.")] bool enable)
             {

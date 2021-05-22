@@ -139,13 +139,14 @@ namespace Emzi0767.CompanionCube
                 .AddScoped<FeedService>()
                 .AddSingleton(this.Discord)
                 .AddSingleton(new PooperService(this.Discord, this.ConnectionStringProvider))
+                .AddSingleton<MailmanService>()
                 .BuildServiceProvider(true);
 
             // create CommandsNext
             this.CommandsNext = this.Discord.UseCommandsNext(new CommandsNextConfiguration
             {
                 CaseSensitive = false,
-                EnableDms = false,
+                EnableDms = true,
                 IgnoreExtraArguments = false,
 
                 EnableDefaultHelp = true,
@@ -278,12 +279,28 @@ namespace Emzi0767.CompanionCube
             else if (ex is ChecksFailedException cfe)
             {
                 if (!cfe.FailedChecks.Any(x => x is NotBlacklistedAttribute || x is RequirePrefixesAttribute))
-                    embed = new DiscordEmbedBuilder
+                {
+                    var cooldown = cfe.FailedChecks.OfType<CooldownAttribute>().FirstOrDefault();
+                    if (cooldown != null)
                     {
-                        Title = "Permission denied",
-                        Description = $"{DiscordEmoji.FromName(e.Context.Client, ":msraisedhand:")} You lack permissions necessary to run this command.",
-                        Color = new DiscordColor(0xFF0000)
-                    };
+                        var rcd = cooldown.GetRemainingCooldown(e.Context);
+                        embed = new DiscordEmbedBuilder
+                        {
+                            Title = "Ratelimit exceeded",
+                            Description = $"{DiscordEmoji.FromName(e.Context.Client, ":msraisedhand:")} You're executing this command too fast, try again in {(int)rcd.TotalMinutes} minutes and {rcd.Seconds} seconds.",
+                            Color = new DiscordColor(0xFF0000)
+                        };
+                    }
+                    else
+                    {
+                        embed = new DiscordEmbedBuilder
+                        {
+                            Title = "Permission denied",
+                            Description = $"{DiscordEmoji.FromName(e.Context.Client, ":msraisedhand:")} You lack permissions necessary to run this command.",
+                            Color = new DiscordColor(0xFF0000)
+                        };
+                    }
+                }
             }
             else
             {
@@ -303,7 +320,7 @@ namespace Emzi0767.CompanionCube
         {
             var gld = msg.Channel.Guild;
             if (gld == null)
-                return Task.FromResult(-1);
+                return Task.FromResult(0);
 
             var gldId = (long)gld.Id;
             using var db = new DatabaseContext(this.ConnectionStringProvider);

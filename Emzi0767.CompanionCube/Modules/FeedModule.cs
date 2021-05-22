@@ -1,4 +1,4 @@
-﻿// This file is part of Companion Cube project
+// This file is part of Companion Cube project
 //
 // Copyright 2018 Emzi0767
 // 
@@ -32,6 +32,7 @@ namespace Emzi0767.CompanionCube.Modules
     [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlacklisted]
     [RequirePermissions(Permissions.ManageChannels)]
+    [RequireGuild]
     public sealed class FeedModule : BaseCommandModule
     {
         private FeedService Feeds { get; }
