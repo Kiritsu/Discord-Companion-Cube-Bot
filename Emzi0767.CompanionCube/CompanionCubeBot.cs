@@ -197,14 +197,19 @@ namespace Emzi0767.CompanionCube
             return this.Discord.ConnectAsync();
         }
 
-        private Task Discord_Ready(DiscordClient sender, ReadyEventArgs e)
+        private async Task Discord_Ready(DiscordClient sender, ReadyEventArgs e)
         {
             sender.Logger.LogInformation(LogEvent, "Client is ready to process events", DateTime.Now);
 
             if (this.GameTimer == null && !string.IsNullOrWhiteSpace(this.Configuration.Discord.Game))
                 this.GameTimer = new Timer(this.GameTimerCallback, sender, TimeSpan.Zero, TimeSpan.FromHours(1));
 
-            return Task.CompletedTask;
+            using (var ssc = this.Services.CreateScope())
+            {
+                var srv = ssc.ServiceProvider.GetRequiredService<MailmanService>();
+                using var db = ssc.ServiceProvider.GetRequiredService<DatabaseContext>();
+                await srv.ForceInitializeAsync(db);
+            }
         }
 
         private Task Discord_GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)

@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -65,19 +67,37 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync("Mailman disabled.");
         }
 
+        [Command("status")]
+        [Description("Checks mailbox status.")]
+        [RequireOwner]
+        public async Task StatusAsync(CommandContext ctx)
+        {
+            var conf = this.Mailman.GetStatus();
+            await ctx.RespondAsync(conf == null
+                ? "Disabled"
+                : $"G: {conf.Guild} / C: {conf.Channel}");
+        }
+
         [Command("send")]
-        [Description("Sends a message to the mailbox.")]
+        [Description("Sends a message to the mailbox. Can be used thrice per 15 minutes.")]
         [Cooldown(3, 900, CooldownBucketType.User)]
         public async Task SendAsync(CommandContext ctx,
             [Description("Contents of the message to send."), RemainingText] string contents)
         {
-            if (contents.Length > 1000)
+            if (contents != null && contents.Length > 1000)
             {
                 await ctx.RespondAsync("Must be less than 1000 characters.");
                 return;
             }
 
-            if (!await this.Mailman.SendMessageAsync(this.Database, ctx.User, ctx.Channel, contents))
+            var result = await this.Mailman.SendMessageAsync(
+                this.Database,
+                ctx.User,
+                ctx.Channel,
+                contents,
+                ctx.Message.Attachments?.Select(x => (x.FileName, new Uri(x.Url), x.FileSize)) ?? Enumerable.Empty<(string, Uri, int)>());
+
+            if (!result)
                 await ctx.RespondAsync("Message wasn't sent: mailman is not enabled.");
             else
                 await ctx.RespondAsync("Message sent. Responses will be delivered via the same DM.");
